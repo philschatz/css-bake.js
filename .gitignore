@@ -1,3 +1,11 @@
 /node_modules/
 
 /tempdir-*
+
+old.html
+old.css
+
+new.html
+new.css
+
+diff.html
