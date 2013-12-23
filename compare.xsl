@@ -73,7 +73,7 @@
       <link rel="stylesheet" href="{$cssPath}"/>
     </xsl:when>
     <xsl:otherwise>
-      <base href=".."/>
+      <!-- <base href=".."/> -->
     </xsl:otherwise>
   </xsl:choose>
   <style>
