@@ -4,7 +4,7 @@ This projects uses https://github.com/philschatz/css-polyfills to generate an HT
 
     npm install
 
-    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.xhtml ./out.html ./out.css
+    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./out.html ./out.css
 
 
 # Generate a Diff
