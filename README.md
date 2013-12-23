@@ -32,3 +32,6 @@ Let's use the example test file in `./test/test.html`
     # Generate the diff'd HTML file
     xsltproc --stringparam oldPath ./old.html ./compare.xsl ./new.html > ./diff.html
 
+    # **Note:** The location of old.html in the previous line is
+    # relative to compare.xsl and **not** the current working directory.
+
