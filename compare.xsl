@@ -88,7 +88,7 @@
 
 <xsl:template match="*">
   <xsl:param name="old"/>
-  <xsl:if test="not(//h:html/h:head) and self::h:body">
+  <xsl:if test="self::h:body and not(preceding-sibling::h:head)">
     <xsl:call-template name="head-styling"/>
   </xsl:if>
   <xsl:choose>
