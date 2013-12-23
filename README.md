@@ -30,5 +30,5 @@ Let's use the example test file in `./test/test.html`
     phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.xhtml ./new.html ./new.css
 
     # Generate the diff'd HTML file
-    xsltproc --stringparam oldPath ./old.html ./xsl/compare.xsl ./new.html > ./diff.html
+    xsltproc --stringparam oldPath ./old.html ./compare.xsl ./new.html > ./diff.html
 
