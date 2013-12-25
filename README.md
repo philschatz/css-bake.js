@@ -21,13 +21,13 @@ Let's use the example test file in `./test/test.html`
 
 
     # Generate the **old** HTML file (the file extension is important)
-    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.xhtml ./old.html ./old.css
+    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./old.html
 
     # Change `./test/test.css` by commenting out a line or two and save
     # ...
 
     # Generate the **new** HTML file
-    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.xhtml ./new.html ./new.css
+    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./new.html
 
     # Generate the diff'd HTML file
     # (the file extension on diff.xhtml is important if opened in a browser)
