@@ -8,6 +8,15 @@
 <xsl:param name="cssPath" select="''" />
 <xsl:param name="oldPath" select="'INVALID_VALUE._NEED_TO_SET_oldPath'" />
 
+<xsl:template name="diff">
+  <xsl:param name="type"/>
+  <xsl:param name="old"/>
+  <xsl:param name="new"/>
+  <xsl:param name="message">old="<xsl:value-of select="$old"/>" and new="<xsl:value-of select="$new"/>"</xsl:param>
+  <xsl:message>DIFF: <xsl:value-of select="$type"/>: <xsl:value-of select="$message"/></xsl:message>
+  <span class="message $type">[DIFF: <xsl:value-of select="$type"/>: <xsl:value-of select="$message"/>]</span>
+</xsl:template>
+
 <xsl:template match="/">
   <xsl:variable name="old" select="document($oldPath)"/>
   <xsl:choose>
@@ -34,7 +43,10 @@
   </xsl:for-each>
   <xsl:if test="count($old/node()) &gt; $newCount">
     <span class="removed">
-      <span class="message">[DIFF: <xsl:value-of select="count($old/node()) - $newCount"/> Nodes were removed]</span>
+      <xsl:call-template name="diff">
+        <xsl:with-param name="type">remove</xsl:with-param>
+        <xsl:with-param name="old" select="count($old/node()) - $newCount"/>
+      </xsl:call-template>
       <xsl:apply-templates mode="ident" select="$old/node()[position() &gt; $newCount]"/>
     </span>
   </xsl:if>
@@ -77,12 +89,9 @@
     </xsl:otherwise>
   </xsl:choose>
   <style>
-    .mismatch { background-color: #ffffcc !important; border: 1px dashed; display: inherit; }
+    .message  { background-color: #ffffcc !important; border: 1px dashed; display: inherit; }
     .added    { background-color: #ccffcc !important; border: 1px dashed; display: inherit; }
     .removed  { background-color: #ffcccc !important; border: 1px dashed; display: inherit; }
-    .mismatch * { margin-left: 2em; }
-    .pseudo-before,   .pseudo-after   { color: #cccccc; }
-    .pseudo-before *, .pseudo-after * { color: black; }
   </style>
 </xsl:template>
 
@@ -93,23 +102,42 @@
   </xsl:if>
   <xsl:choose>
     <xsl:when test="not($old)">
-      <span class="added tag">
-        <span class="message">[DIFF: New element: <xsl:value-of select="name(.)"/><xsl:if test="@class"> class="<xsl:value-of select="@class"/>"</xsl:if><xsl:if test="@style"> style="<xsl:value-of select="@style"/>"</xsl:if>]</span>
+      <span class="added">
+        <xsl:call-template name="diff">
+          <xsl:with-param name="type">add</xsl:with-param>
+          <xsl:with-param name="new">
+            <xsl:value-of select="name(.)"/>
+            <xsl:if test="@class"> class="<xsl:value-of select="@class"/>"</xsl:if>
+            <xsl:if test="@style"> style="<xsl:value-of select="@style"/>"</xsl:if>
+          </xsl:with-param>
+        </xsl:call-template>
         <xsl:apply-templates mode="ident" select="."/>
       </span>
     </xsl:when>
     <xsl:otherwise>
       <xsl:if test="name(.) != name($old)">
-        <span class="mismatch tag">[DIFF: The tags mismatch: old="<xsl:value-of select="name($old)"/>" and new="<xsl:value-of select="name(.)"/>"]</span>
+        <xsl:call-template name="diff">
+          <xsl:with-param name="type">tag</xsl:with-param>
+          <xsl:with-param name="old" select="name($old)"/>
+          <xsl:with-param name="new" select="name(.)"/>
+        </xsl:call-template>
       </xsl:if>
 
       <xsl:copy>
         <xsl:apply-templates select="@*"/>
         <xsl:if test="string(./@class) != string($old/@class)">
-          <span class="mismatch class">[DIFF: Classes mismatch: old="<xsl:value-of select="$old/@class"/>" and new="<xsl:value-of select="./@class"/>"]</span>
+          <xsl:call-template name="diff">
+            <xsl:with-param name="type">class</xsl:with-param>
+            <xsl:with-param name="old" select="$old/@class"/>
+            <xsl:with-param name="new" select="./@class"/>
+          </xsl:call-template>
         </xsl:if>
         <xsl:if test="string(./@style) != string($old/@style)">
-          <span class="mismatch style">[DIFF: Styles mismatch: old="<xsl:value-of select="$old/@style"/>" and new="<xsl:value-of select="./@style"/>"]</span>
+          <xsl:call-template name="diff">
+            <xsl:with-param name="type">style</xsl:with-param>
+            <xsl:with-param name="old" select="$old/@style"/>
+            <xsl:with-param name="new" select="./@style"/>
+          </xsl:call-template>
         </xsl:if>
         <xsl:call-template name="children">
           <xsl:with-param name="old" select="$old"/>
@@ -123,7 +151,11 @@
   <xsl:param name="old"/>
   <xsl:choose>
     <xsl:when test="normalize-space(string(.)) != normalize-space(string($old))">
-      <span class="mismatch text">[DIFF: Text mismatch. old="<xsl:value-of select="$old"/>"]</span>
+      <xsl:call-template name="diff">
+        <xsl:with-param name="type">text</xsl:with-param>
+        <xsl:with-param name="old" select="$old"/>
+        <xsl:with-param name="new" select="string(.)"/>
+      </xsl:call-template>
       <xsl:copy/>
     </xsl:when>
     <xsl:otherwise>

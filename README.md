@@ -21,18 +21,20 @@ Let's use the example test file in `./test/test.html`
 
 
     # Generate the **old** HTML file (the file extension is important)
-    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./old.html
+    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./old.xhtml
 
     # Change `./test/test.css` by commenting out a line or two and save
     # ...
 
     # Generate the **new** HTML file
-    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./new.html
+    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./new.xhtml
 
     # Generate the diff'd HTML file
     # (the file extension on diff.xhtml is important if opened in a browser)
-    xsltproc --stringparam oldPath ./old.html ./compare.xsl ./new.html > ./diff.xhtml
+    xsltproc --stringparam oldPath ./old.xhtml ./compare.xsl ./new.xhtml > ./diff.xhtml
 
-    # **Note:** The location of old.html in the previous line is
+    # **Note:** The location of old.xhtml in the previous line is
     # relative to compare.xsl and **not** the current working directory.
 
+    # Alternatively, you can print out counts of all the changes by running:
+    xsltproc --stringparam oldPath ./old.xhtml --output ./diff.xhtml ./compare.xsl ./new.xhtml 2>&1 | sort | uniq -c | sort -n -r
