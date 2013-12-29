@@ -6,6 +6,14 @@ This projects uses https://github.com/philschatz/css-polyfills to generate an HT
 
     phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./out.html ./out.css
 
+# Generate CSS Coverage
+
+This project can generate CSS coverage, given a CSS file and an HTML file.
+
+Let's use the example test file in `./test/test.html`:
+
+    phantomjs phantom-coverage.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html
+
 
 # Generate a Diff
 
@@ -17,7 +25,7 @@ To do this, you will need to:
 4. generate the diff'd HTML file
 5. Open the diff'd HTML in a browser to see the changes
 
-Let's use the example test file in `./test/test.html`
+Let's use the example test file in `./test/test.html`:
 
 
     # Generate the **old** HTML file (the file extension is important)

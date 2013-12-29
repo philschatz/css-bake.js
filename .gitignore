@@ -2,10 +2,10 @@
 
 /tempdir-*
 
-old.html
-old.css
+old*.xhtml
+old*.css
 
-new.html
-new.css
+new*.xhtml
+new*.css
 
 diff.xhtml
