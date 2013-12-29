@@ -107,6 +107,7 @@ page.onConfirm = (fileName) ->
 
 console.log "Reading CSS file at: #{cssFile}"
 lessFile = fs.read(cssFile, 'utf-8')
+lessFilename = "file://#{cssFile}"
 
 console.log "Opening page at: #{address}"
 startTime = new Date().getTime()
@@ -132,7 +133,7 @@ page.open encodeURI(address), (status) ->
   loadScript(programDir + '/node_modules/css-polyfills/dist.js')
   # loadScript(programDir + '/rasterize.js')
 
-  needToKeepWaiting = page.evaluate((lessFile, config, SPECIAL_CSS_FILE_NAME) ->
+  needToKeepWaiting = page.evaluate((lessFile, lessFilename, config, SPECIAL_CSS_FILE_NAME) ->
 
 
     # File serialization is sent to console.log()
@@ -179,9 +180,18 @@ page.open encodeURI(address), (status) ->
 
       plugins = null
       plugins = [new StyleBaker()] if config.bakeInAllStyles
-      p = new CSSPolyfills(plugins)
+      poly = new CSSPolyfills {plugins: plugins}
 
-      p.run $root, lessFile, (err, newCSS) ->
+      # For large files output the selector matches and ticks (to see progress)
+      poly.on 'selector.end', (selector, matches) ->
+        if 0 == matches
+          console.log("Uncovered: #{selector}")
+        else
+          console.log("Covered: #{matches}: #{selector}")
+
+      poly.on 'tick.start', (count) -> console.log "DEBUG: Starting TICK #{count}"
+
+      poly.run $root, lessFile, lessFilename, (err, newCSS) ->
         throw new Error(err) if err
 
         if config.bakeInAllStyles
@@ -233,7 +243,7 @@ page.open encodeURI(address), (status) ->
 
         outputter('', null, 'PHANTOM_END')
 
-  , lessFile, config, SPECIAL_CSS_FILE_NAME)
+  , lessFile, lessFilename, config, SPECIAL_CSS_FILE_NAME)
 
   if not needToKeepWaiting
     phantom.exit()
