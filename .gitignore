@@ -9,3 +9,6 @@ new*.xhtml
 new*.css
 
 diff.xhtml
+
+coverage/
+css.lcov

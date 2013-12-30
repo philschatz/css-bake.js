@@ -14,6 +14,13 @@ Let's use the example test file in `./test/test.html`:
 
     phantomjs phantom-coverage.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html
 
+You can also generate LCOV data for use in services like <http://coveralls.io>:
+
+    phantomjs phantom-coverage.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html $(pwd)/css.lcov
+
+    # Generate an HTML report
+    genhtml ./css.lcov --output-directory ./coverage
+
 
 # Generate a Diff
 
