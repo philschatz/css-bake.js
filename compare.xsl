@@ -12,9 +12,12 @@
   <xsl:param name="type"/>
   <xsl:param name="old"/>
   <xsl:param name="new"/>
-  <xsl:param name="message">old="<xsl:value-of select="$old"/>" and new="<xsl:value-of select="$new"/>"</xsl:param>
+  <xsl:param name="message">
+    <xsl:text>
+</xsl:text>old="<xsl:value-of select="$old"/>"<xsl:text>
+</xsl:text>new="<xsl:value-of select="$new"/>"</xsl:param>
   <xsl:message>DIFF: <xsl:value-of select="$type"/>: <xsl:value-of select="$message"/></xsl:message>
-  <span class="message $type">[DIFF: <xsl:value-of select="$type"/>: <xsl:value-of select="$message"/>]</span>
+  <pre class="message $type">[DIFF: <xsl:value-of select="$type"/>: <xsl:value-of select="$message"/>]</pre>
 </xsl:template>
 
 <xsl:template match="/">
@@ -89,9 +92,9 @@
     </xsl:otherwise>
   </xsl:choose>
   <style>
-    .message  { background-color: #ffffcc !important; border: 1px dashed; display: inherit; }
-    .added    { background-color: #ccffcc !important; border: 1px dashed; display: inherit; }
-    .removed  { background-color: #ffcccc !important; border: 1px dashed; display: inherit; }
+    .message  { color: red; background-color: #ffffcc !important; border: 1px dashed; display: inherit; }
+    .added    { color: red; background-color: #ccffcc !important; border: 1px dashed; display: inherit; }
+    .removed  { color: red; background-color: #ffcccc !important; border: 1px dashed; display: inherit; }
   </style>
 </xsl:template>
 
