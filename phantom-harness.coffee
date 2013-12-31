@@ -157,10 +157,10 @@ page.open encodeURI(address), (status) ->
               $context = env.helpers.$context
               $context.addClass('js-polyfill-styles')
               styles = $context.data('js-polyfill-styles') or {}
-              style = ''
+              value = ''
               for arg, i in arguments
                 continue if i < 2
-                style += arg.eval(env).toCSS(env)
+                value += arg.eval(env).toCSS(env)
 
               # only put it in the 1st time since rules are matched in reverse order.
               #
@@ -170,7 +170,9 @@ page.open encodeURI(address), (status) ->
               #     color: red;
               #
               # This ensures the style used is `red` since the FixedPointRunner moves up until a rule is "understood"
-              styles[name] ?= style
+              styles[name] ?= []
+              if styles[name].indexOf(value) < 0 # Cannot use `x not in y because of phantomjs`
+                styles[name].push(value)
 
               $context.data('js-polyfill-styles', styles)
 
@@ -200,10 +202,19 @@ page.open encodeURI(address), (status) ->
           $root.find('.js-polyfill-styles').each (i, el) ->
             $el = $(el)
             style = []
-            for ruleName, ruleStr of $el.data('js-polyfill-styles')
-              style.push("#{ruleName}:#{ruleStr}; ")
-              # The FixedPointRunner adds `data-` attributes for each rule that is matched.
-              # Remove it from the HTML
+            rules = $el.data('js-polyfill-styles')
+
+            # Sort the rule names alphabetically so they are canonicalized (for diffing)
+            ruleNames = (key for key of rules)
+            ruleNames.sort()
+
+            # Use the sorted list of rule names for canonicalizing
+            for ruleName in ruleNames
+              ruleValues = rules[ruleName]
+              for ruleStr in ruleValues
+                style.push("#{ruleName}:#{ruleStr}; ")
+                # The FixedPointRunner adds `data-` attributes for each rule that is matched.
+                # Remove it from the HTML
               $el.removeAttr("data-js-polyfill-rule-#{ruleName}")
 
             $el.attr('style', style.join('').trim())
