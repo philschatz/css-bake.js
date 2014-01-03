@@ -211,10 +211,18 @@ page.open encodeURI(address), (status) ->
             # Use the sorted list of rule names for canonicalizing
             for ruleName in ruleNames
               ruleValues = rules[ruleName]
+              # Rule values may end in `!important`.
+              # Output the unimportant ones first, followed by the important ones
               for ruleStr in ruleValues
-                style.push("#{ruleName}:#{ruleStr}; ")
-                # The FixedPointRunner adds `data-` attributes for each rule that is matched.
-                # Remove it from the HTML
+                if not /!important$/.test(ruleStr)
+                  style.push("#{ruleName}:#{ruleStr}; ")
+
+              for ruleStr in ruleValues
+                if /!important$/.test(ruleStr)
+                  style.push("#{ruleName}:#{ruleStr.replace(/\ *!important/, '')}; ")
+
+              # The FixedPointRunner adds `data-` attributes for each rule that is matched.
+              # Remove it from the HTML
               $el.removeAttr("data-js-polyfill-rule-#{ruleName}")
 
             $el.attr('style', style.join('').trim())
