@@ -4,12 +4,16 @@ page = require("webpage").create()
 
 
 if system.args.length < 3
-  console.error "This program takes 3 or 4 arguments:"
-  console.error ""
-  console.error "1. The absolute path to this directory" # (I know, it's annoying but I need it to load the jquery, mathjax, and the like)
-  console.error "2. Input CSS/LESS file (ie '/path/to/style.css')"
-  console.error "3. Absolute path to Input html file (ie '/path/to/file.xhtml)"
-  console.error "4. Output LCOV file (optional)"
+  console.error """This program takes 3 or 4 arguments:"
+
+    1. The absolute path to this directory" # (I know, it's annoying but I need it to load the jquery, mathjax, and the like
+    2. Input CSS/LESS file (ie '/path/to/style.css')
+    3. Absolute path to Input html file (ie '/path/to/file.xhtml)
+    4. Output LCOV file (optional)
+
+    Exit code: 0 for success, negative then that is the uncovered count, positive is some other error
+
+  """
   phantom.exit 1
 
 programDir = system.args[1]
@@ -138,7 +142,7 @@ page.open encodeURI(address), (status) ->
           outputter("end_of_record")
 
 
-        alert JSON.stringify({type:'PHANTOM_END', code:uncoveredCount})
+        alert JSON.stringify({type:'PHANTOM_END', code:-uncoveredCount})
 
   , lessFile, lessFilename)
 
