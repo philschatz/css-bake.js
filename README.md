@@ -2,9 +2,12 @@ This projects uses https://github.com/philschatz/css-polyfills to generate an HT
 
 # Install and Run
 
+You can install locally or globally (`npm install -g .`). Installing globally will give you access to `css-coverage` from the commandline.
+
     npm install
 
-    phantomjs phantom-harness.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html ./out.html ./out.css
+    # Run CSS Coverage
+    node ./bin/css-coverage -s ./test/test.css -h ./test/test.html
 
 # Generate CSS Coverage
 
@@ -12,13 +15,15 @@ This project can generate CSS coverage, given a CSS file and an HTML file.
 
 Let's use the example test file in `./test/test.html`:
 
-    phantomjs phantom-coverage.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html
+    # Run CSS Coverage
+    node ./bin/css-coverage -s ./test/test.css -h ./test/test.html
 
 You can also generate LCOV data for use in services like <http://coveralls.io>:
 
-    phantomjs phantom-coverage.coffee $(pwd) $(pwd)/test/test.css $(pwd)/test/test.html $(pwd)/css.lcov
+    # Run CSS Coverage and generate a LCOV report (with verbose output)
+    node ./bin/css-coverage -v -s ./test/test.css -h ./test/test.html -l ./css.lcov
 
-    # Generate an HTML report
+    # Optionally Generate an HTML report
     genhtml ./css.lcov --output-directory ./coverage
 
 

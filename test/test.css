@@ -10,4 +10,7 @@
   move-to: footer;
 }
 
+.unused-class { display: none; }
+p > div.another-unused-class { display: none; }
+
 .footer { content: pending(footer); }

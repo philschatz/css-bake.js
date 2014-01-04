@@ -142,7 +142,7 @@ page.open encodeURI(address), (status) ->
           outputter("end_of_record")
 
 
-        alert JSON.stringify({type:'PHANTOM_END', code:-uncoveredCount})
+        alert JSON.stringify({type:'PHANTOM_END', code:uncoveredCount})
 
   , lessFile, lessFilename)
 
