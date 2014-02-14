@@ -7,8 +7,5 @@
     "phantomjs": "~1.9.2-6",
     "optimist": "~0.6.0"
   },
-  "bin": {
-    "css-coverage": "bin/css-coverage"
-  },
   "preferGlobal": true
 }
