@@ -2,7 +2,7 @@
   "name": "css-diff",
   "version": "0.0.1",
   "dependencies": {
-    "css-polyfills": "git://github.com/philschatz/css-polyfills",
+    "css-polyfills": ">=0.0.8",
     "requirejs": "~2.1.9",
     "phantomjs": "~1.9.2-6",
     "optimist": "~0.6.0"

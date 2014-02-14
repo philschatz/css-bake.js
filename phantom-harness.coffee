@@ -130,7 +130,7 @@ page.open encodeURI(address), (status) ->
 
   loadScript(programDir + '/lib/phantomjs-hacks.js')
   loadScript(programDir + '/lib/dom-to-xhtml.js')
-  loadScript(programDir + '/node_modules/css-polyfills/dist.js')
+  loadScript(programDir + '/node_modules/css-polyfills/dist/css-polyfills.js')
   # loadScript(programDir + '/rasterize.js')
 
   needToKeepWaiting = page.evaluate((lessFile, lessFilename, config, SPECIAL_CSS_FILE_NAME) ->
@@ -140,127 +140,129 @@ page.open encodeURI(address), (status) ->
     outputter = (path, msg, type='BYTES') ->
       alert(JSON.stringify({path:path, msg:msg, type:type}))
 
-    window.require ['jquery', 'cs!polyfill-path/index'], ($, CSSPolyfills) ->
-      $root = $('html')
+    $ = @$ = @CSSPolyfills.$
+    $root = $('html')
 
-      matchingRules = {}
-      for plugin in CSSPolyfills.DEFAULT_PLUGINS
-        _.extend(matchingRules, plugin.rules)
+    matchingRules = {}
+    for plugin in @CSSPolyfills.DEFAULT_PLUGINS
+      for key, val of plugin.rules
+        matchingRules[key] = val
 
-      class StyleBaker
-        rules:
-          # The magic `*` rule has an additional argument, the name of the rule
-          '*': (env, name) ->
-            # Note: ellipses are not valid in here because of how phantomjs works.
-            # CoffeeScript adds a helper function called `__slice`.
-            if not (name of matchingRules)
-              $context = env.helpers.$context
-              $context.addClass('js-polyfill-styles')
-              styles = $context.data('js-polyfill-styles') or {}
-              value = ''
-              for arg, i in arguments
-                continue if i < 2
-                value += arg.eval(env).toCSS(env)
+    class StyleBaker
+      rules:
+        # The magic `*` rule has an additional argument, the name of the rule
+        '*': (env, name) ->
+          # Note: ellipses are not valid in here because of how phantomjs works.
+          # CoffeeScript adds a helper function called `__slice`.
+          if not (name of matchingRules)
+            $context = env.helpers.$context
+            $context.addClass('js-polyfill-styles')
+            styles = $context.data('js-polyfill-styles') or {}
+            value = ''
+            for arg, i in arguments
+              continue if i < 2
+              value += arg.eval(env).toCSS(env)
 
-              # only put it in the 1st time since rules are matched in reverse order.
-              #
-              # For example, the following rules:
-              #
-              #     color: blue;
-              #     color: red;
-              #
-              # This ensures the style used is `red` since the FixedPointRunner moves up until a rule is "understood"
-              styles[name] ?= []
-              if styles[name].indexOf(value) < 0 # Cannot use `x not in y because of phantomjs`
-                styles[name].push(value)
+            # only put it in the 1st time since rules are matched in reverse order.
+            #
+            # For example, the following rules:
+            #
+            #     color: blue;
+            #     color: red;
+            #
+            # This ensures the style used is `red` since the FixedPointRunner moves up until a rule is "understood"
+            styles[name] ?= []
+            if styles[name].indexOf(value) < 0 # Cannot use `x not in y because of phantomjs`
+              styles[name].push(value)
 
-              $context.data('js-polyfill-styles', styles)
+            $context.data('js-polyfill-styles', styles)
 
-            # Deliberately do not "understand" so this function keeps walking up
-            return false
-
-
-      plugins = null
-      plugins = [new StyleBaker()] if config.bakeInAllStyles
-      poly = new CSSPolyfills {plugins: plugins}
-
-      # For large files output the selector matches and ticks (to see progress)
-      poly.on 'selector.end', (selector, matches) ->
-        if 0 == matches
-          console.log("Uncovered: #{selector}")
-        else
-          console.log("Covered: #{matches}: #{selector}")
-
-      poly.on 'tick.start', (count) -> console.log "DEBUG: Starting TICK #{count}"
-
-      poly.run $root, lessFile, lessFilename, (err, newCSS) ->
-        throw new Error(err) if err
-
-        if config.bakeInAllStyles
-          # Bake in the styles.
-          console.log('Baking styles...')
-          $root.find('.js-polyfill-styles').each (i, el) ->
-            $el = $(el)
-            style = []
-            rules = $el.data('js-polyfill-styles')
-
-            # Sort the rule names alphabetically so they are canonicalized (for diffing)
-            ruleNames = (key for key of rules)
-            ruleNames.sort()
-
-            # Use the sorted list of rule names for canonicalizing
-            for ruleName in ruleNames
-              ruleValues = rules[ruleName]
-              # Rule values may end in `!important`.
-              # Output the unimportant ones first, followed by the important ones
-              for ruleStr in ruleValues
-                if not /!important$/.test(ruleStr)
-                  style.push("#{ruleName}:#{ruleStr}; ")
-
-              for ruleStr in ruleValues
-                if /!important$/.test(ruleStr)
-                  style.push("#{ruleName}:#{ruleStr.replace(/\ *!important/, '')}; ")
-
-              # The FixedPointRunner adds `data-` attributes for each rule that is matched.
-              # Remove it from the HTML
-              $el.removeAttr("data-js-polyfill-rule-#{ruleName}")
-
-            $el.attr('style', style.join('').trim())
-            $el.removeClass('js-polyfill-styles')
+          # Deliberately do not "understand" so this function keeps walking up
+          return false
 
 
-          # Remove autogenerated classes
-          $root.find('.js-polyfill-autoclass').each (i, el) ->
-            $el = $(el)
-
-            # remove everything after `js-polyfill-autoclass (this includes all autogenerated classes)
-            cls = $el.attr('class') or ''
-            if cls.indexOf('js-polyfill-autoclass') >= 0
-              cls = cls.substring(0, cls.indexOf('js-polyfill-autoclass'))
-
-            cls = cls.trim()
-
-            $el.attr('class', cls)
+    plugins = null
+    plugins = [new StyleBaker()] if config.bakeInAllStyles
+    poly = new @CSSPolyfills {plugins: plugins}
 
 
-        # Hack to serialize out the HTML (sent to the console)
-        console.log 'Serializing (X)HTML back out from WebKit...'
-        MAIN_XHTML = '__PhantomJS_MAIN_XHTML_FILE'
-        aryHack =
-          push: (str) -> outputter(MAIN_XHTML, str)
+    # For large files output the selector matches and ticks (to see progress)
+    poly.on 'selector.end', (selector, matches) ->
+      if 0 == matches
+        console.log("Uncovered: #{selector}")
+      else
+        console.log("Covered: #{matches}: #{selector}")
 
-        outputter(MAIN_XHTML, null, 'FILE_START')
-        outputter(MAIN_XHTML, '<html xmlns="http://www.w3.org/1999/xhtml">')
-        window.dom2xhtml.serialize($('body')[0], aryHack)
-        outputter(MAIN_XHTML, '</html>')
-        outputter(MAIN_XHTML, null, 'FILE_END')
+    poly.on 'tick.start', (count) -> console.log "DEBUG: Starting TICK #{count}"
 
-        if not config.bakeInAllStyles
-          outputter(SPECIAL_CSS_FILE_NAME, null, 'FILE_START')
-          outputter(SPECIAL_CSS_FILE_NAME, newCSS)
-          outputter(SPECIAL_CSS_FILE_NAME, null, 'FILE_END')
+    poly.run $root, lessFile, lessFilename, (err, newCSS) ->
+      throw new Error(err) if err
 
-        outputter('', null, 'PHANTOM_END')
+      if config.bakeInAllStyles
+        # Bake in the styles.
+        console.log('Baking styles...')
+        $root.find('.js-polyfill-styles').each (i, el) ->
+          $el = $(el)
+          style = []
+          rules = $el.data('js-polyfill-styles')
+
+          # Sort the rule names alphabetically so they are canonicalized (for diffing)
+          ruleNames = (key for key of rules)
+          ruleNames.sort()
+
+          # Use the sorted list of rule names for canonicalizing
+          for ruleName in ruleNames
+            ruleValues = rules[ruleName]
+            # Rule values may end in `!important`.
+            # Output the unimportant ones first, followed by the important ones
+            for ruleStr in ruleValues
+              if not /!important$/.test(ruleStr)
+                style.push("#{ruleName}:#{ruleStr}; ")
+
+            for ruleStr in ruleValues
+              if /!important$/.test(ruleStr)
+                style.push("#{ruleName}:#{ruleStr.replace(/\ *!important/, '')}; ")
+
+            # The FixedPointRunner adds `data-` attributes for each rule that is matched.
+            # Remove it from the HTML
+            $el.removeAttr("data-js-polyfill-rule-#{ruleName}")
+
+          $el.attr('style', style.join('').trim())
+          $el.removeClass('js-polyfill-styles')
+
+
+        # Remove autogenerated classes
+        $root.find('.js-polyfill-autoclass').each (i, el) ->
+          $el = $(el)
+
+          # remove everything after `js-polyfill-autoclass (this includes all autogenerated classes)
+          cls = $el.attr('class') or ''
+          if cls.indexOf('js-polyfill-autoclass') >= 0
+            cls = cls.substring(0, cls.indexOf('js-polyfill-autoclass'))
+
+          cls = cls.trim()
+
+          $el.attr('class', cls)
+
+
+      # Hack to serialize out the HTML (sent to the console)
+      console.log 'Serializing (X)HTML back out from WebKit...'
+      MAIN_XHTML = '__PhantomJS_MAIN_XHTML_FILE'
+      aryHack =
+        push: (str) -> outputter(MAIN_XHTML, str)
+
+      outputter(MAIN_XHTML, null, 'FILE_START')
+      outputter(MAIN_XHTML, '<html xmlns="http://www.w3.org/1999/xhtml">')
+      window.dom2xhtml.serialize($('body')[0], aryHack)
+      outputter(MAIN_XHTML, '</html>')
+      outputter(MAIN_XHTML, null, 'FILE_END')
+
+      if not config.bakeInAllStyles
+        outputter(SPECIAL_CSS_FILE_NAME, null, 'FILE_START')
+        outputter(SPECIAL_CSS_FILE_NAME, newCSS)
+        outputter(SPECIAL_CSS_FILE_NAME, null, 'FILE_END')
+
+      outputter('', null, 'PHANTOM_END')
 
   , lessFile, lessFilename, config, SPECIAL_CSS_FILE_NAME)
 
