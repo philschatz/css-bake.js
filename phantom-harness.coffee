@@ -181,19 +181,47 @@ page.open encodeURI(address), (status) ->
           return false
 
 
-    plugins = null
+    plugins = []
     plugins = [new StyleBaker()] if config.bakeInAllStyles
-    poly = new @CSSPolyfills {plugins: plugins}
+    config = {plugins: plugins}
+    # Since we are just baking, do not run all the move-to, counters, etc plugins
+    if config.bakeInAllStyles
+      console.log('DEBUG: Skipping all the default plugins like move-to and counters because we are just baking.')
+      config.doNotIncludeDefaultPlugins = true
+    poly = new @CSSPolyfills(config)
 
 
     # For large files output the selector matches and ticks (to see progress)
-    poly.on 'selector.end', (selector, matches) ->
-      if 0 == matches
-        console.log("Uncovered: #{selector}")
-      else
-        console.log("Covered: #{matches}: #{selector}")
+    outputOnce = false
+    poly.on 'selector.start', (selector) ->
+      if !outputOnce
+        console.log('DEBUG: Matching selectors...')
+        outputOnce = true
 
-    poly.on 'tick.start', (count) -> console.log "DEBUG: Starting TICK #{count}"
+    tickStart = null
+    tickCount = 0
+    tickNum = 0
+    lastPrint = new Date()
+    countSinceLastPrint = 0
+    poly.on 'tick.start', (count) ->
+      tickStart = new Date()
+      tickCount = count
+      tickNum = 0
+      console.log("DEBUG: Starting TICK #{count}")
+
+    poly.on 'tick.node', () ->
+      tickNum += 1
+      countSinceLastPrint += 1
+      if countSinceLastPrint > 500
+        countSinceLastPrint = 0
+        now = new Date()
+        if now - lastPrint > 60000 # Every minute
+          console.log("DEBUG: Tick Progress #{Math.floor(tickNum * 100 / tickCount)}%")
+          lastPrint = now
+
+    poly.on 'tick.end', () ->
+      console.log("DEBUG: TICK took #{(new Date() - tickStart) / 1000} sec")
+
 
     poly.run $root, lessFile, lessFilename, (err, newCSS) ->
       throw new Error(err) if err
