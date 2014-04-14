@@ -1,6 +1,6 @@
 {
   "name": "css-diff",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "css-polyfills": ">=0.0.10",
     "requirejs": "~2.1.9",
