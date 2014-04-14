@@ -2,10 +2,12 @@
   "name": "css-diff",
   "version": "0.0.1",
   "dependencies": {
-    "css-polyfills": ">=0.0.8",
+    "css-polyfills": ">=0.0.10",
     "requirejs": "~2.1.9",
     "phantomjs": "~1.9.2-6",
-    "optimist": "~0.6.0"
+    "optimist": "~0.6.0",
+    "jquery": "~2.1.0"
   },
-  "preferGlobal": true
+  "preferGlobal": true,
+  "readmeFilename": "README.md"
 }
