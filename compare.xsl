@@ -8,12 +8,31 @@
 <xsl:param name="cssPath" select="''" />
 <xsl:param name="oldPath" select="'INVALID_VALUE._NEED_TO_SET_oldPath'" />
 
+
+<xsl:template name="xpath">
+  <!-- Stop at the root or an element with an @id attribute -->
+  <xsl:if test="not(@id) and ../..">
+    <xsl:for-each select="..">
+      <xsl:call-template name="xpath"/>
+    </xsl:for-each>
+  </xsl:if>
+
+  <xsl:text>/</xsl:text>
+  <xsl:choose>
+    <xsl:when test="@id">#<xsl:value-of select="@id"/></xsl:when>
+    <xsl:when test="@class">.[<xsl:value-of select="@class"/>]</xsl:when>
+    <xsl:otherwise><xsl:value-of select="local-name()"/>(<xsl:value-of select="position()"/>)</xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
 <xsl:template name="diff">
   <xsl:param name="type"/>
   <xsl:param name="old"/>
   <xsl:param name="new"/>
   <xsl:param name="message">
     <xsl:text>
+</xsl:text>
+    path="<xsl:call-template name="xpath"/>"<xsl:text>
 </xsl:text>old="<xsl:value-of select="$old"/>"<xsl:text>
 </xsl:text>new="<xsl:value-of select="$new"/>"</xsl:param>
   <xsl:message>DIFF: <xsl:value-of select="$type"/>: <xsl:value-of select="$message"/></xsl:message>
