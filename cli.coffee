@@ -11,7 +11,7 @@ args = optimist
     boolean   : true
     describe  : 'Show this help info and exit'
   )
-  .options('h',
+  .options('i',
     alias     : 'input-html'
     describe  : 'Input HTML File'
   )
@@ -44,8 +44,6 @@ PHANTOMJS_HARNESS = path.join(__dirname, 'phantom-harness.coffee')
 
 unless inputCss and inputHtml and outputHtml
   console.log('Missing Required arg')
-  console.log argv
-  console.log inputCss, inputHtml, outputHtml
   args.showHelp()
   process.exit(1)
 
@@ -63,6 +61,7 @@ unless fs.existsSync(inputHtml)
   console.log('Input HTML file not found')
   process.exit(1)
 
+console.log(argv)
 
 options =
   cwd: __dirname
