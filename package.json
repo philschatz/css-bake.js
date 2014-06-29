@@ -1,6 +1,9 @@
 {
   "name": "css-bake",
-  "version": "0.1.2",
+  "version": "0.1.3",
+  "scripts": {
+    "test": "./bin/css-bake --input-html ./test/test.html --input-css ./test/test.css --output-html ./output.html"
+  },
   "dependencies": {
     "css-polyfills": ">=0.0.13",
     "requirejs": "~2.1.9",
