@@ -72,7 +72,9 @@ options =
 options.stdio = 'inherit' if verbose
 
 
-args = [PHANTOMJS_HARNESS, __dirname, inputCss, inputHtml, outputHtml, outputCss]
+args = [PHANTOMJS_HARNESS, __dirname, inputCss, inputHtml, outputHtml]
+args.push(outputCss) if outputCss
+
 child = spawn(PHANTOMJS_BIN, args, options)
 
 child.on 'close', (code) ->
