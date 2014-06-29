@@ -1,8 +1,8 @@
 {
   "name": "css-bake",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
-    "css-polyfills": ">=0.0.10",
+    "css-polyfills": ">=0.0.13",
     "requirejs": "~2.1.9",
     "phantomjs": "~1.9.2-6",
     "optimist": "~0.6.1",

@@ -184,7 +184,10 @@ page.open encodeURI(address), (status) ->
 
     plugins = []
     plugins = [new StyleBaker()] if config.bakeInAllStyles
-    polyConfig = {plugins: plugins}
+    polyConfig =
+      plugins: plugins
+      removeAutogenClasses: config.bakeInAllStyles
+
     # Since we are just baking, do not run all the move-to, counters, etc plugins
     # if config.bakeInAllStyles
     #   console.log('DEBUG: Skipping all the default plugins like move-to and counters because we are just baking.')

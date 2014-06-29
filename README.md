@@ -45,6 +45,24 @@ and you should get the following `output.html`:
 
 You may also add an optional `--output-css ./output.css` which will place the styles in a CSS file instead of "baking" them into the `style="..."` attribute.
 
+Then, `output.html` will be:
+
+    <html xmlns="http://www.w3.org/1999/xhtml">
+      <body>
+        <span class="js-polyfill-autoclass-0-dot-wrapped-outside">
+          <div class="wrapped">Hello World</div>
+        </span>
+      </body>
+    </html>
+
+and `output.css` will be:
+
+    .wrapped {
+      border: 10px solid black;
+    }
+    .js-polyfill-autoclass-0-dot-wrapped-outside {
+      border: 10px solid green;
+    }
 
 # Bonus! Generate a Diff
 
