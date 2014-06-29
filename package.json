@@ -5,7 +5,7 @@
     "css-polyfills": ">=0.0.10",
     "requirejs": "~2.1.9",
     "phantomjs": "~1.9.2-6",
-    "optimist": "~0.6.0",
+    "optimist": "~0.6.1",
     "jquery": "~2.1.0"
   },
   "preferGlobal": true,
