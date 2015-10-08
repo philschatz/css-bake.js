@@ -8,11 +8,12 @@
     "css-bake": "bin/css-bake"
   },
   "dependencies": {
+    "coffee-script": "^1.10.0",
     "css-polyfills": ">=0.0.13",
-    "requirejs": "~2.1.9",
-    "phantomjs": "~1.9.2-6",
+    "jquery": "~2.1.0",
     "optimist": "~0.6.1",
-    "jquery": "~2.1.0"
+    "phantomjs": "~1.9.2-6",
+    "requirejs": "~2.1.9"
   },
   "homepage": "https://github.com/philschatz/css-bake.js",
   "preferGlobal": true,
