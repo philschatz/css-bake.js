@@ -40,7 +40,7 @@ PHANTOMJS_BIN = path.join(__dirname, 'node_modules/.bin/phantomjs')
 PHANTOMJS_HARNESS = path.join(__dirname, 'phantom-harness.coffee')
 
 
-{c:inputCss, h:inputHtml, o:outputHtml, x:outputCss, v:verbose} = argv
+{c:inputCss, i:inputHtml, o:outputHtml, x:outputCss, v:verbose} = argv
 
 unless inputCss and inputHtml and outputHtml
   console.log('Missing Required arg')
