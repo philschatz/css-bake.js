@@ -228,7 +228,9 @@ page.open encodeURI(address), (status) ->
 
 
     poly.run $root, lessFile, lessFilename, (err, newCSS) ->
-      throw new Error(err) if err
+      if error
+        console.log "Error: #{JSON.stringify(err)}"
+        throw err
 
       if config.bakeInAllStyles
         # Bake in the styles.
